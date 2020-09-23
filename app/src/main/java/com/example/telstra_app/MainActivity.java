@@ -3,6 +3,7 @@ package com.example.telstra_app;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -12,8 +13,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+    public static final String SHAREDPREFS = "sharedprefs";
+    public static final String KEYNAME = "keyname";
+    public static final String KEYPWD = "keypwd";
     private static final String TAG = MainActivity.class.getSimpleName() ;
-    EditText nameEditText;
+    EditText nameEditText , passwordEditText;
     @Override
     protected void onStart() {
 
@@ -22,9 +26,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause() { //savetext here
         super.onPause();
         Log.i(TAG,"It has paused");
+       saveData();
+    }
+
+    private void saveData() {
+        nameEditText = findViewById(R.id.editNameText);
+        passwordEditText = findViewById(R.id.editPasswordText);
+        String name = nameEditText.getText().toString();
+        String password = passwordEditText.getText().toString();
+
+        //open a file
+        SharedPreferences preferences = getSharedPreferences(SHAREDPREFS , MODE_PRIVATE);
+
+        //open to file
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putString(KEYNAME,name);
+        editor.putString(KEYPWD,password);
+        //saving
+        editor.commit();
+
+
     }
 
     @Override
@@ -37,6 +62,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.i(TAG,"It has resumed");
+        restoreData();
+        //this is restoring
+    }
+
+    private void restoreData() {
+        nameEditText = findViewById(R.id.editNameText);
+        passwordEditText = findViewById(R.id.editPasswordText);
+        SharedPreferences preferences = getSharedPreferences(SHAREDPREFS,MODE_PRIVATE);
+
+        String name = preferences.getString(KEYNAME,"");
+        String pwd = preferences.getString(KEYPWD,"");
+
+        nameEditText.setText(name);
+        passwordEditText.setText(pwd);
     }
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         Log.i(TAG,"mainactivity created");
-        nameEditText = findViewById(R.id.personView);
+        nameEditText = findViewById(R.id.editNameText);
     }
     static{
         int a=add(10,30);
